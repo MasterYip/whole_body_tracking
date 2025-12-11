@@ -110,11 +110,11 @@ If you have poor network connectivity or prefer to work offline, you can use loc
 
 ```bash
 python scripts/csv_to_npz.py --input_file {motion_name}.csv --input_fps 30 --output_name {motion_name} \
---motion_file dataset/converted/{motion_name}.npz --headless
+--motion_file artifacts/converted/{motion_name}.npz --headless
 
 # Example:
-python scripts/csv_to_npz.py --input_file dataset/LAFAN1_Unitree_Retargeting/g1/sprint1_subject4.csv \
---input_fps 30 --output_name sprint1_subject4 --motion_file dataset/converted/sprint1_subject4.npz --headless
+python scripts/csv_to_npz.py --input_file artifacts/LAFAN1_Unitree_Retargeting/g1/sprint1_subject4.csv \
+--input_fps 30 --output_name sprint1_subject4 --motion_file artifacts/converted/sprint1_subject4.npz --headless
 ```
 
 This will save the processed motion file locally and skip the WandB upload.
@@ -122,10 +122,10 @@ This will save the processed motion file locally and skip the WandB upload.
 - Test the local motion file by replaying it in Isaac Sim:
 
 ```bash
-python scripts/replay_npz.py --motion_file dataset/converted/{motion_name}.npz
+python scripts/replay_npz.py --motion_file artifacts/converted/{motion_name}.npz
 
 # Example:
-python scripts/replay_npz.py --motion_file dataset/converted/sprint1_subject4.npz
+python scripts/replay_npz.py --motion_file artifacts/converted/sprint1_subject4.npz
 ```
 
 ### Policy Training
@@ -142,12 +142,12 @@ python scripts/rsl_rl/train.py --task=Tracking-Flat-G1-v0 \
 
 ```bash
 python scripts/rsl_rl/train.py --task=Tracking-Flat-G1-v0 \
---motion_file dataset/converted/{motion_name}.npz \
+--motion_file artifacts/converted/{motion_name}.npz \
 --headless --logger wandb --log_project_name {project_name} --run_name {run_name}
 
 # Example:
 python scripts/rsl_rl/train.py --task=Tracking-Flat-G1-v0 \
---motion_file dataset/converted/sprint1_subject4.npz \
+--motion_file artifacts/converted/sprint1_subject4.npz \
 --headless --logger wandb --log_project_name whole_body_tracking --run_name sprint1_subject4
 ```
 
