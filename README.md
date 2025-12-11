@@ -153,14 +153,31 @@ python scripts/rsl_rl/train.py --task=Tracking-Flat-G1-v0 \
 
 ### Policy Evaluation
 
-- Play the trained policy by the following command:
+- Play the trained policy using WandB:
 
 ```bash
 python scripts/rsl_rl/play.py --task=Tracking-Flat-G1-v0 --num_envs=2 --wandb_path={wandb-run-path}
+
+# Example:
+python scripts/rsl_rl/play.py --task=Tracking-Flat-G1-v0 --num_envs=2 \
+--wandb_path=master_yip-harbin-institute-of-technology/whole_body_tracking/c3ocpm3n
 ```
 
 The WandB run path can be located in the run overview. It follows the format {your_organization}/{project_name}/ along
 with a unique 8-character identifier. Note that run_name is different from run_path.
+
+- Or play the trained policy using local checkpoint and motion files:
+
+```bash
+python scripts/rsl_rl/play.py --task=Tracking-Flat-G1-v0 --num_envs=2 \
+--ckpt_path logs/rsl_rl/{experiment_name}/{run_dir}/model_{iteration}.pt \
+--motion_file artifacts/converted/{motion_name}.npz
+
+# Example:
+python scripts/rsl_rl/play.py --task=Tracking-Flat-G1-v0 --num_envs=2 \
+--ckpt_path wandb/run-20251211_201745-c3ocpm3n/files/model_3000.pt \
+--motion_file artifacts/converted/sprint1_subject4.npz
+```
 
 ## Code Structure
 
