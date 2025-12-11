@@ -30,6 +30,7 @@ parser.add_argument(
 )
 parser.add_argument("--output_name", type=str, required=True, help="The name of the motion npz file.")
 parser.add_argument("--output_fps", type=int, default=50, help="The fps of the output motion.")
+parser.add_argument("--motion_file", type=str, default=None, help="Path to load motion from file instead of wandb.")
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -298,17 +299,22 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene, joi
             ):
                 log[k] = np.stack(log[k], axis=0)
 
-            np.savez("/tmp/motion.npz", **log)
+            output_path = args_cli.motion_file if args_cli.motion_file else "/tmp/motion.npz"
+            np.savez(output_path, **log)
+            print(f"[INFO]: Motion saved to {output_path}")
 
-            import wandb
+            if args_cli.motion_file is None:
+                import wandb
 
-            COLLECTION = args_cli.output_name
-            run = wandb.init(project="csv_to_npz", name=COLLECTION)
-            print(f"[INFO]: Logging motion to wandb: {COLLECTION}")
-            REGISTRY = "motions"
-            logged_artifact = run.log_artifact(artifact_or_path="/tmp/motion.npz", name=COLLECTION, type=REGISTRY)
-            run.link_artifact(artifact=logged_artifact, target_path=f"wandb-registry-{REGISTRY}/{COLLECTION}")
-            print(f"[INFO]: Motion saved to wandb registry: {REGISTRY}/{COLLECTION}")
+                COLLECTION = args_cli.output_name
+                run = wandb.init(project="csv_to_npz", name=COLLECTION)
+                print(f"[INFO]: Logging motion to wandb: {COLLECTION}")
+                REGISTRY = "motions"
+                logged_artifact = run.log_artifact(artifact_or_path=output_path, name=COLLECTION, type=REGISTRY)
+                run.link_artifact(artifact=logged_artifact, target_path=f"wandb-registry-{REGISTRY}/{COLLECTION}")
+                print(f"[INFO]: Motion saved to wandb registry: {REGISTRY}/{COLLECTION}")
+            else:
+                print(f"[INFO]: Skipping wandb upload, motion saved locally to {output_path}")
 
 
 def main():

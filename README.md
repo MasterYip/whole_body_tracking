@@ -77,6 +77,7 @@ Note: The reference motion should be retargeted and use generalized coordinates 
     - Christiano Ronaldo celebration is from [ASAP](https://github.com/LeCAR-Lab/ASAP).
     - Balance motions are from [HuB](https://hub-robot.github.io/)
 
+#### Option 1: Using WandB Registry (Recommended for managing multiple motions)
 
 - Log in to your WandB account; access Registry under Core on the left. Create a new registry collection with the name "
   Motions" and artifact type "All Types".
@@ -101,14 +102,53 @@ python scripts/replay_npz.py --registry_name={your-organization}-org/wandb-regis
     - Make sure to export WANDB_ENTITY to your organization name, not your personal username.
     - If /tmp folder is not accessible, modify csv_to_npz.py L319 & L326 to a temporary folder of your choice.
 
+#### Option 2: Using Local Motion Files (Alternative for poor network conditions)
+
+If you have poor network connectivity or prefer to work offline, you can use local motion files directly:
+
+- Convert retargeted motions and save locally:
+
+```bash
+python scripts/csv_to_npz.py --input_file {motion_name}.csv --input_fps 30 --output_name {motion_name} \
+--motion_file dataset/converted/{motion_name}.npz --headless
+
+# Example:
+python scripts/csv_to_npz.py --input_file dataset/LAFAN1_Unitree_Retargeting/g1/sprint1_subject4.csv \
+--input_fps 30 --output_name sprint1_subject4 --motion_file dataset/converted/sprint1_subject4.npz --headless
+```
+
+This will save the processed motion file locally and skip the WandB upload.
+
+- Test the local motion file by replaying it in Isaac Sim:
+
+```bash
+python scripts/replay_npz.py --motion_file dataset/converted/{motion_name}.npz
+
+# Example:
+python scripts/replay_npz.py --motion_file dataset/converted/sprint1_subject4.npz
+```
+
 ### Policy Training
 
-- Train policy by the following command:
+- Train policy using WandB registry:
 
 ```bash
 python scripts/rsl_rl/train.py --task=Tracking-Flat-G1-v0 \
 --registry_name {your-organization}-org/wandb-registry-motions/{motion_name} \
 --headless --logger wandb --log_project_name {project_name} --run_name {run_name}
+```
+
+- Or train policy using local motion file:
+
+```bash
+python scripts/rsl_rl/train.py --task=Tracking-Flat-G1-v0 \
+--motion_file dataset/converted/{motion_name}.npz \
+--headless --logger wandb --log_project_name {project_name} --run_name {run_name}
+
+# Example:
+python scripts/rsl_rl/train.py --task=Tracking-Flat-G1-v0 \
+--motion_file dataset/converted/sprint1_subject4.npz \
+--headless --logger wandb --log_project_name whole_body_tracking --run_name sprint1_subject4
 ```
 
 ### Policy Evaluation
